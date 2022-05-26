@@ -4,8 +4,11 @@
 #pravý sensor->
 #u křižovatek- naprogramovat přes ovladání možnost > až uvidíž křižovatku > ("odboč vlevo, nebo vpravo")
 
-
-
+krizovatkaVLEVO = ""
+krizovatkaVPRAVO = ""
+krizovatkaROVNE = ""
+moznost = 0
+radio.set_group(25)
 def turnright():
     global item
     pins.analog_write_pin(AnalogPin.P1, 600)
@@ -49,3 +52,11 @@ def on_forever():
     if item > 30:
         stop()
 basic.forever(on_forever)
+
+
+
+def on_received_string(receivedString):
+    global moznost
+    if receivedString == "krizovatkaVLEVO":
+        moznost = 1
+radio.on_received_string(on_received_string)

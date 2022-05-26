@@ -3,6 +3,11 @@
 // levý senzor->
 // pravý sensor->
 // u křižovatek- naprogramovat přes ovladání možnost > až uvidíž křižovatku > ("odboč vlevo, nebo vpravo")
+let krizovatkaVLEVO = ""
+let krizovatkaVPRAVO = ""
+let krizovatkaROVNE = ""
+let moznost = 0
+radio.setGroup(25)
 function turnright() {
     
     pins.analogWritePin(AnalogPin.P1, 600)
@@ -54,6 +59,13 @@ basic.forever(function on_forever() {
     
     if (item > 30) {
         stop()
+    }
+    
+})
+radio.onReceivedString(function on_received_string(receivedString: string) {
+    
+    if (receivedString == "krizovatkaVLEVO") {
+        moznost = 1
     }
     
 })
