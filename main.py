@@ -4,10 +4,8 @@
 #pravý sensor->
 #u křižovatek- naprogramovat přes ovladání možnost > až uvidíž křižovatku > ("odboč vlevo, nebo vpravo")
 
-krizovatkaVLEVO = ""
-krizovatkaVPRAVO = ""
-krizovatkaROVNE = ""
-moznost = 0
+
+moznost = ""
 radio.set_group(25)
 def turnright():
     global item
@@ -28,7 +26,7 @@ def forward():
     pins.digital_write_pin(DigitalPin.P12, 1)
 def turnleft():
     global item
-    pins.analog_write_pin(AnalogPin.P1, 100)
+    pins.analog_write_pin(AnalogPin.P1, 200)
     pins.digital_write_pin(DigitalPin.P8, 1)
     pins.analog_write_pin(AnalogPin.P2, 600)
     pins.digital_write_pin(DigitalPin.P12, 1)
@@ -40,23 +38,36 @@ pins.set_pull(DigitalPin.P5, PinPullMode.PULL_UP)
 item = 0
 
 def on_forever():
-    global item
-    if pins.digital_read_pin(DigitalPin.P4) == 0 and pins.digital_read_pin(DigitalPin.P5) == 0:
-        forward()
+    global item, moznost
+    
+    if moznost == "krizovatkaVLEVO" and pins.digital_read_pin(DigitalPin.P4) == 1 and pins.digital_read_pin(DigitalPin.P5) == 1:
+        turnleft()
+    elif moznost == "krizovatkaVPRAVO" and pins.digital_read_pin(DigitalPin.P4) == 1 and pins.digital_read_pin(DigitalPin.P5) == 1:
+        turnright() 
     elif pins.digital_read_pin(DigitalPin.P4) == 1 and pins.digital_read_pin(DigitalPin.P5) == 1:
+        forward()
+
+
+    elif pins.digital_read_pin(DigitalPin.P4) == 0 and pins.digital_read_pin(DigitalPin.P5) == 0:
         item += 1
-    elif pins.digital_read_pin(DigitalPin.P4) == 1 and pins.digital_read_pin(DigitalPin.P5) == 0:
+    if moznost == "krizovatkaVPRAVO" and pins.digital_read_pin(DigitalPin.P4) == 0 and pins.digital_read_pin(DigitalPin.P5) == 1:
         turnright()
     elif pins.digital_read_pin(DigitalPin.P4) == 0 and pins.digital_read_pin(DigitalPin.P5) == 1:
+        turnright()
+    if moznost == "krizovatkaVLEVO" and pins.digital_read_pin(DigitalPin.P4) == 1 and pins.digital_read_pin(DigitalPin.P5) == 0:
+        turnright()
+    elif moznost == "krizovatkaVPRAVO" and pins.digital_read_pin(DigitalPin.P4) == 1 and pins.digital_read_pin(DigitalPin.P5) == 0:
+        forward()
+    elif pins.digital_read_pin(DigitalPin.P4) == 1 and pins.digital_read_pin(DigitalPin.P5) == 0:
         turnleft()
     if item > 30:
         stop()
+
 basic.forever(on_forever)
 
 
 
 def on_received_string(receivedString):
     global moznost
-    if receivedString == "krizovatkaVLEVO":
-        moznost = 1
+    moznost = receivedString
 radio.on_received_string(on_received_string)

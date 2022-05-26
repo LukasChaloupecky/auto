@@ -3,10 +3,7 @@
 // levý senzor->
 // pravý sensor->
 // u křižovatek- naprogramovat přes ovladání možnost > až uvidíž křižovatku > ("odboč vlevo, nebo vpravo")
-let krizovatkaVLEVO = ""
-let krizovatkaVPRAVO = ""
-let krizovatkaROVNE = ""
-let moznost = 0
+let moznost = ""
 radio.setGroup(25)
 function turnright() {
     
@@ -33,7 +30,7 @@ function forward() {
 
 function turnleft() {
     
-    pins.analogWritePin(AnalogPin.P1, 100)
+    pins.analogWritePin(AnalogPin.P1, 200)
     pins.digitalWritePin(DigitalPin.P8, 1)
     pins.analogWritePin(AnalogPin.P2, 600)
     pins.digitalWritePin(DigitalPin.P12, 1)
@@ -47,13 +44,27 @@ pins.setPull(DigitalPin.P5, PinPullMode.PullUp)
 item = 0
 basic.forever(function on_forever() {
     
-    if (pins.digitalReadPin(DigitalPin.P4) == 0 && pins.digitalReadPin(DigitalPin.P5) == 0) {
-        forward()
+    if (moznost == "krizovatkaVLEVO" && pins.digitalReadPin(DigitalPin.P4) == 1 && pins.digitalReadPin(DigitalPin.P5) == 1) {
+        turnleft()
+    } else if (moznost == "krizovatkaVPRAVO" && pins.digitalReadPin(DigitalPin.P4) == 1 && pins.digitalReadPin(DigitalPin.P5) == 1) {
+        turnright()
     } else if (pins.digitalReadPin(DigitalPin.P4) == 1 && pins.digitalReadPin(DigitalPin.P5) == 1) {
+        forward()
+    } else if (pins.digitalReadPin(DigitalPin.P4) == 0 && pins.digitalReadPin(DigitalPin.P5) == 0) {
         item += 1
-    } else if (pins.digitalReadPin(DigitalPin.P4) == 1 && pins.digitalReadPin(DigitalPin.P5) == 0) {
+    }
+    
+    if (moznost == "krizovatkaVPRAVO" && pins.digitalReadPin(DigitalPin.P4) == 0 && pins.digitalReadPin(DigitalPin.P5) == 1) {
         turnright()
     } else if (pins.digitalReadPin(DigitalPin.P4) == 0 && pins.digitalReadPin(DigitalPin.P5) == 1) {
+        turnright()
+    }
+    
+    if (moznost == "krizovatkaVLEVO" && pins.digitalReadPin(DigitalPin.P4) == 1 && pins.digitalReadPin(DigitalPin.P5) == 0) {
+        turnright()
+    } else if (moznost == "krizovatkaVPRAVO" && pins.digitalReadPin(DigitalPin.P4) == 1 && pins.digitalReadPin(DigitalPin.P5) == 0) {
+        forward()
+    } else if (pins.digitalReadPin(DigitalPin.P4) == 1 && pins.digitalReadPin(DigitalPin.P5) == 0) {
         turnleft()
     }
     
@@ -64,8 +75,5 @@ basic.forever(function on_forever() {
 })
 radio.onReceivedString(function on_received_string(receivedString: string) {
     
-    if (receivedString == "krizovatkaVLEVO") {
-        moznost = 1
-    }
-    
+    moznost = receivedString
 })
